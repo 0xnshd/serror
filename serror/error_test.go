@@ -152,6 +152,15 @@ func Test_Wrap(t *testing.T) {
 				},
 			},
 		},
+		{
+			inputCtx: map[string]any{
+				"c": 3,
+				"d": 4,
+			},
+			inputErrorRecord: ErrorRecord{
+				Context: nil,
+			},
+		},
 	}
 
 	for _, tt := range tests {
