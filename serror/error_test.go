@@ -2,6 +2,7 @@ package serror
 
 import (
 	"errors"
+	"log/slog"
 	"reflect"
 	"testing"
 )
@@ -167,6 +168,39 @@ func Test_Wrap(t *testing.T) {
 			if v2 != v {
 				t.Errorf(_msg, tt.inputCtx, tt.inputErrorRecord)
 			}
+		}
+	}
+}
+
+func Test_E(t *testing.T) {
+	errR := &ErrorRecord{
+		Err: errors.New("sample error"),
+	}
+	tests := []struct {
+		input *ErrorRecord
+		want  slog.Attr
+	}{
+		{
+			input: nil,
+			want:  slog.Attr{},
+		},
+		{
+			input: errR,
+			want:  slog.Any(slogkeyError, errR),
+		},
+	}
+
+	for _, tt := range tests {
+		got := E(tt.input)
+
+		_msg := "E = %v, want %v"
+
+		if got.Key != tt.want.Key {
+			t.Errorf(_msg, got, tt.want)
+		}
+
+		if got.Value.Any() != tt.want.Value.Any() {
+			t.Errorf(_msg, got, tt.want)
 		}
 	}
 }

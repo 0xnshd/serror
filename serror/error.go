@@ -2,6 +2,7 @@
 package serror
 
 import (
+	"log/slog"
 	"maps"
 )
 
@@ -23,4 +24,12 @@ func Wrap(ctx map[string]any, errRecord *ErrorRecord) {
 		errRecord.Context = map[string]any{}
 	}
 	maps.Copy(errRecord.Context, ctx)
+}
+
+func E(err *ErrorRecord) slog.Attr {
+	if err == nil {
+		return slog.Attr{}
+	}
+
+	return slog.Any(slogkeyError, err)
 }
