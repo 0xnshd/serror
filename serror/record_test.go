@@ -99,8 +99,8 @@ func Test_ErrorRecord_Attrs(t *testing.T) {
 			[]slog.Attr{
 				slog.String(slogkeyErrorTrace, "main -> func1"),
 				slog.String(slogkeyErrorCause, "sample error"),
-				slog.Any(slogkeyErrorPrefix+"a", 1),
-				slog.Any(slogkeyErrorPrefix+"b", "2"),
+				slog.Any("a", 1),
+				slog.Any("b", "2"),
 			},
 		},
 		{
@@ -121,8 +121,8 @@ func Test_ErrorRecord_Attrs(t *testing.T) {
 				slog.String(slogkeyErrorCause, "sample error"),
 				slog.String(slogkeyErrorTrait, "SampleErrors"),
 				slog.Int(slogkeyErrorCode, 1),
-				slog.Any(slogkeyErrorPrefix+"a", 1),
-				slog.Any(slogkeyErrorPrefix+"b", "2"),
+				slog.Any("a", 1),
+				slog.Any("b", "2"),
 			},
 		},
 	}

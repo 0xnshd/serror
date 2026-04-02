@@ -6,11 +6,11 @@ import (
 )
 
 const (
-	slogkeyErrorPrefix = "error."
-	slogkeyErrorTrait  = slogkeyErrorPrefix + "trait"
-	slogkeyErrorCode   = slogkeyErrorPrefix + "code"
-	slogkeyErrorTrace  = slogkeyErrorPrefix + "trace"
-	slogkeyErrorCause  = slogkeyErrorPrefix + "cause"
+	slogkeyError      = "error"
+	slogkeyErrorTrait = "trait"
+	slogkeyErrorCode  = "code"
+	slogkeyErrorTrace = "trace"
+	slogkeyErrorCause = "cause"
 )
 
 type ErrorRecord struct {
@@ -43,7 +43,7 @@ func (e *ErrorRecord) Attrs() []slog.Attr {
 	attrs = append(attrs, slog.String(slogkeyErrorCause, e.Err.Error()))
 
 	for k, v := range e.Context {
-		attrs = append(attrs, slog.Any(slogkeyErrorPrefix+k, v))
+		attrs = append(attrs, slog.Any(k, v))
 	}
 
 	return attrs
