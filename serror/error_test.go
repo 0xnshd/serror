@@ -12,19 +12,19 @@ func Test_New(t *testing.T) {
 		inputError error
 		inputTrait ErrorTrait
 		inputCtx   map[string]any
-		want       ErrorRecord
+		want       *ErrorRecord
 	}{
 		{
 			inputError: nil,
 			inputTrait: ErrorTrait{},
 			inputCtx:   map[string]any{},
-			want:       ErrorRecord{},
+			want:       &ErrorRecord{},
 		},
 		{
 			inputError: errors.New("sample error"),
 			inputTrait: ErrorTrait{},
 			inputCtx:   map[string]any{},
-			want: ErrorRecord{
+			want: &ErrorRecord{
 				Trace:   []string{"serror.Test_New.func1", "serror.Test_New"},
 				Err:     errors.New("sample error"),
 				Trait:   ErrorTrait{},
@@ -38,7 +38,7 @@ func Test_New(t *testing.T) {
 				Trait: "SampleErrors",
 			},
 			inputCtx: map[string]any{},
-			want: ErrorRecord{
+			want: &ErrorRecord{
 				Trace: []string{"serror.Test_New.func1", "serror.Test_New"},
 				Err:   errors.New("sample error"),
 				Trait: ErrorTrait{
@@ -55,7 +55,7 @@ func Test_New(t *testing.T) {
 				"a": 1,
 				"b": "2",
 			},
-			want: ErrorRecord{
+			want: &ErrorRecord{
 				Trace: []string{"serror.Test_New.func1", "serror.Test_New"},
 				Err:   errors.New("sample error"),
 				Trait: ErrorTrait{},
@@ -75,7 +75,7 @@ func Test_New(t *testing.T) {
 				"a": 1,
 				"b": "2",
 			},
-			want: ErrorRecord{
+			want: &ErrorRecord{
 				Trace: []string{"serror.Test_New.func1", "serror.Test_New"},
 				Err:   errors.New("sample error"),
 				Trait: ErrorTrait{
@@ -93,7 +93,7 @@ func Test_New(t *testing.T) {
 	_msg := "New = %v, want %v"
 
 	for _, tt := range tests {
-		var got ErrorRecord
+		var got *ErrorRecord
 		_panic := false
 
 		func() {

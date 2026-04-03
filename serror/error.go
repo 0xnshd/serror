@@ -6,12 +6,12 @@ import (
 	"maps"
 )
 
-func New(err error, trait ErrorTrait, ctx map[string]any) ErrorRecord {
+func New(err error, trait ErrorTrait, ctx map[string]any) *ErrorRecord {
 	if err == nil {
 		panic(PanicNilError)
 	}
 
-	return ErrorRecord{
+	return &ErrorRecord{
 		Trace:   getTrace(3),
 		Trait:   trait,
 		Err:     err,
