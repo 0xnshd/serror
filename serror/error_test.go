@@ -12,7 +12,7 @@ func Test_New(t *testing.T) {
 		inputError error
 		inputTrait ErrorTrait
 		inputCtx   map[string]any
-		want       *ErrorRecord
+		want       error
 	}{
 		{
 			inputError: nil,
@@ -93,7 +93,7 @@ func Test_New(t *testing.T) {
 	_msg := "New = %v, want %v"
 
 	for _, tt := range tests {
-		var got *ErrorRecord
+		var gotE error
 		_panic := false
 
 		func() {
@@ -105,31 +105,34 @@ func Test_New(t *testing.T) {
 					_panic = true
 				}
 			}()
-			got = New(tt.inputError, tt.inputTrait, tt.inputCtx)
+			gotE = New(tt.inputError, tt.inputTrait, tt.inputCtx)
 		}()
 
 		if _panic {
 			continue
 		}
 
-		if got.Error() != tt.want.Error() {
-			t.Errorf(_msg, got, tt.want)
+		if gotE.Error() != tt.want.Error() {
+			t.Errorf(_msg, gotE, tt.want)
 			continue
 		}
 
-		tt.want.Trace = append(tt.want.Trace, "testing.tRunner", "runtime.goexit")
-		if !reflect.DeepEqual(got.Trace, tt.want.Trace) {
-			t.Errorf(_msg, got, tt.want)
+		got := gotE.(*ErrorRecord)
+		want := tt.want.(*ErrorRecord)
+
+		want.Trace = append(want.Trace, "testing.tRunner", "runtime.goexit")
+		if !reflect.DeepEqual(got.Trace, want.Trace) {
+			t.Errorf(_msg, got, want)
 			continue
 		}
 
-		if !reflect.DeepEqual(got.Trait, tt.want.Trait) {
-			t.Errorf(_msg, got, tt.want)
+		if !reflect.DeepEqual(got.Trait, want.Trait) {
+			t.Errorf(_msg, got, want)
 			continue
 		}
 
-		if !reflect.DeepEqual(got.Context, tt.want.Context) {
-			t.Errorf(_msg, got, tt.want)
+		if !reflect.DeepEqual(got.Context, want.Context) {
+			t.Errorf(_msg, got, want)
 			continue
 		}
 	}
@@ -137,15 +140,15 @@ func Test_New(t *testing.T) {
 
 func Test_Wrap(t *testing.T) {
 	tests := []struct {
-		inputCtx         map[string]any
-		inputErrorRecord ErrorRecord
+		inputCtx   map[string]any
+		inputError error
 	}{
 		{
 			inputCtx: map[string]any{
 				"c": 3,
 				"d": 4,
 			},
-			inputErrorRecord: ErrorRecord{
+			inputError: &ErrorRecord{
 				Context: map[string]any{
 					"a": 1,
 					"b": 2,
@@ -157,25 +160,38 @@ func Test_Wrap(t *testing.T) {
 				"c": 3,
 				"d": 4,
 			},
-			inputErrorRecord: ErrorRecord{
+			inputError: &ErrorRecord{
 				Context: nil,
 			},
+		},
+		{
+			inputCtx: map[string]any{
+				"c": 3,
+				"d": 4,
+			},
+			inputError: errors.New("sample error"),
 		},
 	}
 
 	for _, tt := range tests {
-		Wrap(tt.inputCtx, &tt.inputErrorRecord)
+		Wrap(tt.inputCtx, tt.inputError)
 
 		_msg := "Wrap : %v, want %v"
+
+		inputErrorRecord, ok := tt.inputError.(*ErrorRecord)
+		if !ok {
+			continue
+		}
+
 		for k, v := range tt.inputCtx {
-			v2, ok := tt.inputErrorRecord.Context[k]
+			v2, ok := inputErrorRecord.Context[k]
 
 			if !ok {
-				t.Errorf(_msg, tt.inputCtx, tt.inputErrorRecord)
+				t.Errorf(_msg, tt.inputCtx, inputErrorRecord)
 			}
 
 			if v2 != v {
-				t.Errorf(_msg, tt.inputCtx, tt.inputErrorRecord)
+				t.Errorf(_msg, tt.inputCtx, inputErrorRecord)
 			}
 		}
 	}
@@ -185,8 +201,10 @@ func Test_E(t *testing.T) {
 	errR := &ErrorRecord{
 		Err: errors.New("sample error"),
 	}
+	err := errors.New("sample error")
+
 	tests := []struct {
-		input *ErrorRecord
+		input error
 		want  slog.Attr
 	}{
 		{
@@ -196,6 +214,10 @@ func Test_E(t *testing.T) {
 		{
 			input: errR,
 			want:  slog.Any(slogkeyError, errR),
+		},
+		{
+			input: err,
+			want:  slog.Any(slogkeyError, err),
 		},
 	}
 

@@ -6,7 +6,7 @@ import (
 	"maps"
 )
 
-func New(err error, trait ErrorTrait, ctx map[string]any) *ErrorRecord {
+func New(err error, trait ErrorTrait, ctx map[string]any) error {
 	if err == nil {
 		panic(PanicNilError)
 	}
@@ -19,17 +19,27 @@ func New(err error, trait ErrorTrait, ctx map[string]any) *ErrorRecord {
 	}
 }
 
-func Wrap(ctx map[string]any, errRecord *ErrorRecord) {
+func Wrap(ctx map[string]any, err error) {
+	errRecord, ok := err.(*ErrorRecord)
+	if !ok {
+		return
+	}
+
 	if errRecord.Context == nil {
 		errRecord.Context = map[string]any{}
 	}
 	maps.Copy(errRecord.Context, ctx)
 }
 
-func E(err *ErrorRecord) slog.Attr {
+func E(err error) slog.Attr {
 	if err == nil {
 		return slog.Attr{}
 	}
 
-	return slog.Any(slogkeyError, err)
+	e, ok := err.(*ErrorRecord)
+	if !ok {
+		return slog.Any(slogkeyError, err)
+	}
+
+	return slog.Any(slogkeyError, e)
 }
