@@ -43,3 +43,13 @@ func E(err error) slog.Attr {
 
 	return slog.Any(slogkeyError, e)
 }
+
+func OfTrait(err error, trait ErrorTrait) bool {
+	e, ok := err.(*ErrorRecord)
+
+	if !ok {
+		return false
+	}
+
+	return (e.Trait.Code == trait.Code) && (e.Trait.Trait == trait.Trait)
+}

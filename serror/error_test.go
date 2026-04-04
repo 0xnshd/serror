@@ -235,3 +235,40 @@ func Test_E(t *testing.T) {
 		}
 	}
 }
+
+func Test_OfTrait(t *testing.T) {
+	tests := []struct {
+		input      error
+		inputTrait ErrorTrait
+		want       bool
+	}{
+		{
+			errors.New("sample error"),
+			ErrorTrait{},
+			false,
+		},
+		{
+			New(errors.New("sample error"), ErrorTrait{Code: 1, Trait: "Sample"}, map[string]any{}),
+			ErrorTrait{Code: 1, Trait: "Sample"},
+			true,
+		},
+		{
+			New(errors.New("sample error"), ErrorTrait{Code: 2, Trait: "Sample"}, map[string]any{}),
+			ErrorTrait{Code: 1, Trait: "Sample"},
+			false,
+		},
+		{
+			New(errors.New("sample error"), ErrorTrait{Code: 1, Trait: "Sample E"}, map[string]any{}),
+			ErrorTrait{Code: 1, Trait: "Sample"},
+			false,
+		},
+	}
+
+	for _, tt := range tests {
+		got := OfTrait(tt.input, tt.inputTrait)
+
+		if got != tt.want {
+			t.Errorf("OfTrait = %v, want %v", got, tt.want)
+		}
+	}
+}
