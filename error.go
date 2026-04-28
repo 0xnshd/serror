@@ -31,6 +31,16 @@ func Wrap(ctx map[string]any, err error) {
 	maps.Copy(errRecord.Context, ctx)
 }
 
+func OfTrait(err error, trait ErrorTrait) bool {
+	e, ok := err.(*ErrorRecord)
+
+	if !ok {
+		return false
+	}
+
+	return (e.Trait.Code == trait.Code) && (e.Trait.Trait == trait.Trait)
+}
+
 func E(err error) slog.Attr {
 	if err == nil {
 		return slog.Attr{}
@@ -42,14 +52,4 @@ func E(err error) slog.Attr {
 	}
 
 	return slog.Any(slogkeyError, e)
-}
-
-func OfTrait(err error, trait ErrorTrait) bool {
-	e, ok := err.(*ErrorRecord)
-
-	if !ok {
-		return false
-	}
-
-	return (e.Trait.Code == trait.Code) && (e.Trait.Trait == trait.Trait)
 }
